@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+
+{% block app_content %}
+  <h1> Sign-In </h1>
+  <div class="row">
+    <div class="col-md-4">
+      <form action="" method="POST" class="form" role="form">
+        {{ form.hidden_tag() }}
+        {{ wtf.form_errors(form, hiddens="only") }}
+        <dl>
+          {{ wtf.form_field(form.email, class='form-control', placeholder='Please enter your email address.') }}
+          {{ wtf.form_field(form.password, class='form-control', placeholder='Please enter your password.') }}
+        </dl>
+        <p>
+          <input type=submit class='btn btn-warning btn-block'>
+        </p>
+      </form>
+    </div>
+  </div>
+  <br>
+  <p> <a href="{{ url_for('user.forgot_password') }}">Reset Your Password</a></p>
+  <p> <a href="{{ url_for('user.register') }}">Register for an Account</a></p>
+{% endblock %}
+

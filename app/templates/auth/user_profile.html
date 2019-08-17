@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% from "common/_formshelpers.html" import render_multiselect_field %}
+
+{% block app_content %}
+
+  <!-- Breadcrumb-->
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">Home</li>
+    <li class="breadcrumb-item">Admin</li>
+    <li class="breadcrumb-item active">User Profile</li>
+    <!-- Breadcrumb Menu-->
+    <li class="breadcrumb-menu d-md-down-none">
+      <div class="btn-group" role="group" aria-label="Button group">
+      </div>
+    </li>
+  </ol>
+
+  <div class="row">
+    <div class="col-md-4">
+      <h1> Edit User Profile </h1>
+      <form action="" method="POST" class="form" role="form">
+        {{ form.hidden_tag() }}
+        {{ wtf.form_errors(form, hiddens="only") }}
+        <dl>
+          {{ wtf.form_field(form.first_name, class='form-control', placeholder='Edit the first name') }}
+          {{ wtf.form_field(form.last_name, class='form-control', placeholder='Edit the last name') }}
+          {{ render_multiselect_field(form.roles, current_roles) }}
+        </dl>
+        <div class="card-footer ">
+          <button type="submit " class="btn btn-sm btn-primary ">
+            Submit
+          </button>
+          <button type="reset " class="btn btn-sm btn-danger ">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

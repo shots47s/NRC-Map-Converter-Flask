@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+  <h1>Register for a New Account</h1>
+  <div class="row">
+    <div class="col-md-4">
+      <form action="" method="POST" novalidate formnovalidate class="form" role="form">
+        {{ form.hidden_tag() }}
+        {{ wtf.form_errors(form, hiddens="only") }}
+        <dl>
+          {{ wtf.form_field(form.first_name, class='form-control', placeholder='Please enter your first name') }}
+          {{ wtf.form_field(form.last_name, class='form-control', placeholder='Please enter your last name') }}
+          {{ wtf.form_field(form.email, class='form-control', placeholder='Please enter your email address') }}
+          {{ wtf.form_field(form.password, class='form-control', placeholder='Please select a password') }}
+          {{ wtf.form_field(form.retype_password, class='form-control', placeholder='Please retype your selected password') }}
+        </dl>
+        <p>
+          <button type='submit' class='btn btn-block btn-success'>Save</button>
+        </p>
+      </form>
+    </div>
+  </div>
+  <br>
+  <p><a href="{{ url_for('user.login') }}">Already Registered? Sign in.</a></p>
+{% endblock %}
