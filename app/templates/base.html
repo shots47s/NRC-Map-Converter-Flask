@@ -58,6 +58,11 @@ $(function() {
             </a>
           </li>
           {% else %}
+            <li>
+              <a href="{{ url_for('auth.user_profile_page', user_id=current_user.id) }}">
+                Edit Profile
+              </a>
+            </li>
             <li><a href="{{ url_for('user.logout') }}">{{ _('Logout') }}</a></li>
           {% endif %}
         </ul>

@@ -25,27 +25,25 @@ def create_user_page():
   roles = Role.query.all()
   form.roles.choices = [(r.id, r.name) for r in roles]
 
-  print(request.method)
-  if not form.validate():
-    print(form.errors.items())
-
   if request.method == 'POST' and form.validate():
-    user = User.query.filter(User.email == request.form['email']).first()
-    print(user)
-    if not user:
-      user = User(email=request.form['email'],
-                  first_name=request.form['first_name'],
-                  last_name=request.form['last_name'],
-                  password=current_app.user_manager.hash_password(request.form['password']),
-                  active=True,
-                  email_confirmed_at=datetime.utcnow())
+      user = User.query.filter(User.email == request.form['email']).first()
+      if not user:
+        user = User(email=request.form['email'],
+                    first_name=request.form['first_name'],
+                    last_name=request.form['last_name'],
+                    password=current_app.user_manager.hash_password(request.form['password']),
+                    active=True,
+                    email_confirmed_at=datetime.utcnow())
 
-      for r in form.roles.data:
-        user.roles.append(Role.query.filter(Role.id==r).first())
+        for r in form.roles.data:
+          user.roles.append(Role.query.filter(Role.id==r).first())
 
-      db.session.add(user)
-      db.session.commit()
-    return redirect(url_for('auth.user_admin_page')) #!!! check
+        db.session.add(user)
+        db.session.commit()
+      else:
+        flash("User already exists")
+
+      return redirect(url_for('auth.user_admin_page')) #!!! check
   return render_template('auth/admin/create_user.html',form=form,admin=True)
 
 @auth_bp.route('/auth/delete_user', methods=['GET'])
@@ -66,7 +64,7 @@ def delete_user_page():
     return redirect(request.referrer)
 
 @auth_bp.route('/auth/profile', methods=['GET','POST'])
-@roles_accepted('admin')
+@roles_accepted('admin','member')
 def user_profile_page():
   roleNames = Role.query.all()
   user = User.query.filter(User.id==request.args.get('user_id')).first()
@@ -78,8 +76,7 @@ def user_profile_page():
   roles = Role.query.all()
   form.roles.choices = [(r.id, r.name) for r in roles]
   current_roles = [r.id for r in user.roles]
-  print(request.method)
-  print(form.validate())
+
   if request.method == 'POST' and form.validate():
     user.first_name = request.form['first_name']
     user.last_name = request.form['last_name']
