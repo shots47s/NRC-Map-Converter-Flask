@@ -42,6 +42,9 @@ def create_app(config_settings=Config):
   from app.util import util_bp
   app.register_blueprint(util_bp)
 
+  from app.oauth.routes import blueprint as google_blueprint
+  app.register_blueprint(google_blueprint, url_prefix="/login")
+
   from app.main import main_bp
   app.register_blueprint(main_bp)
 
@@ -58,6 +61,9 @@ def create_app(config_settings=Config):
 ### Function to initialize the email and logs
 def init_email_and_logs_error_handler(app):
   if app.debug and not app.testing: return
+
+  import logging
+  from logging.handlers import SMTPHandler
 
   if app.config['MAIL_SERVER']:
     auth = None
