@@ -1,4 +1,6 @@
 from flask_user import UserMixin
+from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
+from sqlalchemy.orm.collections import attribute_mapped_collection
 from app import db
 
 class User(db.Model, UserMixin):
@@ -50,3 +52,16 @@ class UsersRoles(db.Model):
   id = db.Column(db.Integer(), primary_key=True)
   user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
   role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
+
+# OAUTH Model
+class OAUTH(OAuthConsumerMixin, db.Model):
+  __table_args__ = (db.UniqueConstraint("provider", "provider_user_id"),)
+  provider_user_id = db.Column(db.String(256), nullable=False)
+  provider_user_login = db.Column(db.String(256), nullable=False)
+  user_id = db.Column(db.Integer, db.ForeignKey(User.id),nullable=False)
+  user = db.relationship(User,
+                         backref=db.backref("oauth",
+                                            collection_class=attribute_mapped_collection('provider'),
+                                            cascade="all, delete-orphan")
+                         )
+
