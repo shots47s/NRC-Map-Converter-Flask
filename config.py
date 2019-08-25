@@ -16,6 +16,7 @@ class Config(object):
     MAIL_PASSWORD       = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = '"Shawn Brown" <shawntbrown@gmail.com>'
     ADMINS              = ['shawntbrown@gmail.com']
+    LOG_TO_STDOUT       = True
 
 
     LANGUAGES = ['en', 'fr']
@@ -37,3 +38,7 @@ class Config(object):
     USER_LOGIN_TEMPLATE           = "auth/flask_user/login.html"
     USER_FORGOT_PASSWORD_TEMPLATE = "auth/flask_user/forgot_password.html"
     USER_REGISTER_TEMPLATE        = "auth/flask_user/register.html"
+
+    GOOGLE_OAUTH_CLIENT_ID = os.environ.get("GOOGLE_OAUTH_CLIENT_ID")
+    GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET")
+    OAUTHLIB_INSECURE_TRANSPORT = os.environ.get("OAUTHLIB_INSECURE_TRANSPORT")
