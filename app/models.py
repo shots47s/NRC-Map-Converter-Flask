@@ -54,7 +54,7 @@ class UsersRoles(db.Model):
   role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
 
 # OAUTH Model
-class OAUTH(OAuthConsumerMixin, db.Model):
+class OAuth(OAuthConsumerMixin, db.Model):
   __table_args__ = (db.UniqueConstraint("provider", "provider_user_id"),)
   provider_user_id = db.Column(db.String(256), nullable=False)
   provider_user_login = db.Column(db.String(256), nullable=False)
