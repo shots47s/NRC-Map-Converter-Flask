@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 {% import 'bootstrap/wtf.html' as wtf %}
 
+{% block scripts %}
+{{ super() }}
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<meta name="google-signin-client_id" content="{{ config.GOOGLE_OAUTH_CLIENT_ID }}">
+{% endblock %}
 
 {% block app_content %}
   <h1> Sign-In </h1>
@@ -17,12 +22,16 @@
           <input type=submit class='btn btn-warning btn-block'>
         </p>
       </form>
-      <p> Or </p>
-      <p>
+      <dl>
         <a href="{{ url_for('google.login') }}" >
-          Login with Google
+         <img border="0" src="{{ url_for('static',filename='images/goog_but.png') }}" width="200px">
         </a>
-      </p>
+      </dl>
+      <dl>
+        <a href="{{ url_for('orcid.login') }}">
+          <img border="0" src="{{ url_for('static',filename='images/orcid_signin.png') }}" width="200px">
+        </a>
+      </dl>
     </div>
   </div>
   <br>

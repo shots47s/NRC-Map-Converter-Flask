@@ -5,18 +5,17 @@ from flask_dance.contrib.google import make_google_blueprint
 from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
 from sqlalchemy.orm.exc import NoResultFound
-from app.models import db, User, OAuth
+from app.models import db, User, OAuth, Role, UsersRoles
 from datetime import datetime
 
-blueprint = make_google_blueprint(
+google_blueprint = make_google_blueprint(
   storage=SQLAlchemyStorage(OAuth, db.session, user=current_user),
   scope=['https://www.googleapis.com/auth/userinfo.email','openid',
          'https://www.googleapis.com/auth/userinfo.profile']
 )
 
-
-@oauth_authorized.connect_via(blueprint)
-def google_logged_in(blueprint, token):
+@oauth_authorized.connect_via(google_blueprint)
+def google_logged_in(google_blueprint, token):
 
   ## Check if I have an API token
 
@@ -26,7 +25,7 @@ def google_logged_in(blueprint, token):
 
 
   ## Get this blueprints session
-  response = blueprint.session.get("/oauth2/v2/userinfo")
+  response = google_blueprint.session.get("/oauth2/v2/userinfo")
   if not response.ok:
     flash("Failed to fetch the user info from session", category="error")
     return False
@@ -36,14 +35,14 @@ def google_logged_in(blueprint, token):
 
   # Find this OAuth token in the database, or create it
   query = OAuth.query.filter_by(
-    provider=blueprint.name, provider_user_id=google_user_id
+    provider=google_blueprint.name, provider_user_id=google_user_id
   )
   try:
     oauth = query.one()
   except NoResultFound:
     google_user_login = str(google_info["email"])
     oauth = OAuth(
-      provider=blueprint.name,
+      provider=google_blueprint.name,
       provider_user_id=google_user_id,
       provider_user_login=google_user_login,
       token=token,
@@ -62,10 +61,14 @@ def google_logged_in(blueprint, token):
                   last_name=google_info['family_name'],
                   active=True,
                   email_confirmed_at=datetime.utcnow())
+      ### make the user a member
+      user.roles.append(Role.query.filter(Role.name=="member").first())
       oauth.user = user
 
       db.session.add_all([user,oauth])
       db.session.commit()
+
+
 
       login_user(user)
       flash("Successfully signed in with Google.")
@@ -84,9 +87,9 @@ def google_logged_in(blueprint, token):
 
 
 # notify on OAuth provider error
-@oauth_error.connect_via(blueprint)
-def google_error(blueprint,**kwargs):
-  msg = "OAuth error from {name}! ".format(name=blueprint.name)
+@oauth_error.connect_via(google_blueprint)
+def google_error(googe_blueprint,**kwargs):
+  msg = "OAuth error from {name}! ".format(name=google_blueprint.name)
   for k,v in kwargs.items():
     msg += "{} = {}".format(k,str(v))
   print("msg= {}".format(msg))

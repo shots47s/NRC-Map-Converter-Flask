@@ -25,7 +25,9 @@
         <dl>
           {{ wtf.form_field(form.first_name, class='form-control', placeholder='Edit the first name') }}
           {{ wtf.form_field(form.last_name, class='form-control', placeholder='Edit the last name') }}
-          {{ render_multiselect_field(form.roles, current_roles) }}
+          {% if admin %}
+            {{ render_multiselect_field(form.roles, current_roles) }}
+          {% endif %}
         </dl>
         <div class="card-footer ">
           <button type="submit " class="btn btn-sm btn-primary ">

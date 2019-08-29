@@ -18,7 +18,7 @@ bootstrap = Bootstrap()
 
 def create_app(config_settings=Config):
 
-  app = Flask(__name__)
+  app = Flask(__name__, static_url_path='/static')
   app.config.from_object(config_settings)
 
   db.init_app(app)
@@ -42,8 +42,11 @@ def create_app(config_settings=Config):
   from app.util import util_bp
   app.register_blueprint(util_bp)
 
-  from app.oauth.routes import blueprint as google_blueprint
+  from app.oauth.google_blueprint import google_blueprint
   app.register_blueprint(google_blueprint, url_prefix="/login")
+
+  from app.oauth.orcid_blueprint import orcid_blueprint
+  app.register_blueprint(orcid_blueprint, url_prefix="/login")
 
   from app.main import main_bp
   app.register_blueprint(main_bp)
