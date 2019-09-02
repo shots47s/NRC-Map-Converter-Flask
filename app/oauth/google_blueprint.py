@@ -1,4 +1,4 @@
-from flask import flash
+from flask import flash,session,redirect
 from flask_user import current_user
 from flask_login import login_user
 from flask_dance.contrib.google import make_google_blueprint
@@ -18,14 +18,13 @@ google_blueprint = make_google_blueprint(
 def google_logged_in(google_blueprint, token):
 
   ## Check if I have an API token
-
   if not token:
     flash("Failed to log in.", category="error")
     return False
 
-
   ## Get this blueprints session
   response = google_blueprint.session.get("/oauth2/v2/userinfo")
+
   if not response.ok:
     flash("Failed to fetch the user info from session", category="error")
     return False
@@ -50,11 +49,9 @@ def google_logged_in(google_blueprint, token):
 
   if current_user.is_anonymous:
     if oauth.user:
-      print("We are funcking here")
       login_user(oauth.user)
       flash("Successfully logged in through Google")
     else:
-      print("Why is there no oauth")
       ### No user, so create a user
       user = User(email=google_info['email'],
                   first_name=google_info['given_name'],
@@ -68,13 +65,11 @@ def google_logged_in(google_blueprint, token):
       db.session.add_all([user,oauth])
       db.session.commit()
 
-
-
       login_user(user)
       flash("Successfully signed in with Google.")
   else:
     if oauth.user:
-      pass
+      flash("Account already associated with another user")
 
     else:
       oauth.user = current_user
@@ -84,13 +79,19 @@ def google_logged_in(google_blueprint, token):
 
   return False
 
-
+#This will allow a redirect is login_next_url is in the session
+@oauth_authorized.connect
+def redirect_to_next_url(google_blueprint, token):
+    # retrieve `next_url` from Flask's session cookie
+    if session.get('login_next_url') is not None:
+      next_url = session["login_next_url"]
+    # redirect the user to `next_url`
+      return redirect(next_url)
 
 # notify on OAuth provider error
 @oauth_error.connect_via(google_blueprint)
-def google_error(googe_blueprint,**kwargs):
+def google_error(google_blueprint,**kwargs):
   msg = "OAuth error from {name}! ".format(name=google_blueprint.name)
   for k,v in kwargs.items():
     msg += "{} = {}".format(k,str(v))
-  print("msg= {}".format(msg))
   flash(msg, category="error")

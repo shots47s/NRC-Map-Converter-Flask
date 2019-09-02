@@ -12,8 +12,8 @@
 {% endmacro %}
 
 {% macro render_multiselect_field(field, selected) %}
-  <dt> {{ field.label }}
-  <dd>
+  <div class="form-group">
+    {{field.label}}
     <select class="mdb-select md-form" id ="{{ field.name }}" name="{{ field.name }}" multiple>
       {% for o in field.choices %}
         {% if o[0] in selected %}
@@ -23,7 +23,7 @@
         {% endif %}
       {% endfor %}
     </select>
-  </dd>
+  </div>
 {% endmacro %}
 
 {% macro render_select_field(field,selected) %}

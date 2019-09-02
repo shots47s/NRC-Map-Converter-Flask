@@ -8,34 +8,37 @@
 {% endblock %}
 
 {% block app_content %}
-  <h1> Sign-In </h1>
   <div class="row">
-    <div class="col-md-4">
-      <form action="" method="POST" class="form" role="form">
-        {{ form.hidden_tag() }}
-        {{ wtf.form_errors(form, hiddens="only") }}
-        <dl>
-          {{ wtf.form_field(form.email, class='form-control', placeholder='Please enter your email address.') }}
-          {{ wtf.form_field(form.password, class='form-control', placeholder='Please enter your password.') }}
-        </dl>
-        <p>
-          <input type=submit class='btn btn-warning btn-block'>
-        </p>
-      </form>
-      <dl>
-        <a href="{{ url_for('google.login') }}" >
-         <img border="0" src="{{ url_for('static',filename='images/goog_but.png') }}" width="200px">
-        </a>
-      </dl>
-      <dl>
-        <a href="{{ url_for('orcid.login') }}">
-          <img border="0" src="{{ url_for('static',filename='images/orcid_signin.png') }}" width="200px">
-        </a>
-      </dl>
+    <div class="col-md-4 py-3">
+      <h3> Sign-In </h3>
     </div>
   </div>
-  <br>
-  <p> <a href="{{ url_for('user.forgot_password') }}">Reset Your Password</a></p>
-  <p> <a href="{{ url_for('user.register') }}">Register for an Account</a></p>
+  <form action="" method="POST" class="form col-md-4" role="form">
+    {{ form.hidden_tag() }}
+    {{ wtf.form_errors(form, hiddens="only") }}
+    {{ wtf.form_field(form.email, class='form-control', placeholder='Please enter your email address.') }}
+    {{ wtf.form_field(form.password, class='form-control', placeholder='Please enter your password.') }}
+    <button type=submit class="btn btn-primary btn-block">Login</button>
+  </form>
+  <div class="row py-3 px-3">
+    <div class="col-md-4">
+      <a href="{{ url_for('google.login') }}" class="btn btn-primary btn-labeled">
+        <span class="btn-label">
+          <i class="fab fa-google"></i>
+        </span>
+        Sign In/Up with Google
+      </a>
+    </div>
+  </div>
+  <div class="row px-3">
+    <div class="col-md-4">
+      <a href="{{ url_for('orcid.login') }}" class="btn btn-success btn-labeled">
+        <span class="btn-label">
+          <i class="ai ai-orcid"></i>
+        </span>
+        Sign In/Up with ORCID
+      </a>
+    </div>
+  </div>
 {% endblock %}
 

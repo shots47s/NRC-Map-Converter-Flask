@@ -1,64 +1,55 @@
 {% extends 'base.html' %}
-
-{% block app_content %}
-
 {% from "auth/common/form_macros.html" import render_field, render_submit_field %}
 
-  <!-- Breadcrumb-->
+{% block app_content %}
+<!-- Breadcrumb-->
+<nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item">Home</li>
     <li class="breadcrumb-item">Admin</li>
     <li class="breadcrumb-item active">Users</li>
-    <!-- Breadcrumb Menu-->
-    <li class="breadcrumb-menu d-md-down-none">
-      <div class="btn-group" role="group" aria-label="Button group">
-        <a class="btn" href="#">
-          <i class="icon-speech"></i>
-        </a>
-      </div>
-    </li>
   </ol>
-  <div class="container-fluid">
-    <div class="animated fadeIn">
-      <div class="card ">
-          <div class="card-header ">
-            <strong>System Users</strong>
-            <a href="{{ url_for('auth.create_user_page') }}" class="btn btn-pill btn-sm btn-primary pull-right">Create User</a>
-          </div>
-          <div class="card-body ">
-            <table class="table table-hover table-striped" style="padding-top: 50px;">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Role</th>
-                  <th>Email</th>
-                  <th>Confirmed</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for user in users %}
-                <tr>
-                  <td>{{ user.name() }}</td>
-                  <td>{{ user.roles|join(", ")|safe }}
-                  <td>{{ user.email_confirmed_at }}</td>
-                  <td>
-                    <div class="btn-group" role="group" aria-label="...">
-                      <a href="{{ url_for('auth.delete_user_page', user_id=user.id) }}">
-                        Delete
-                      </a> |
-                      <a href="{{ url_for('auth.user_profile_page', user_id=user.id) }}">
-                        Edit
-                      </a>
-                    </div>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-          <div class="card-footer ">
-          </div>
-      </div>
+</nav>
+
+<div class="card">
+  <div class="card-header">
+    System Users
+    <a href="{{ url_for('auth.create_user_page') }}" class="btn btn-pill btn-sm btn-primary float-right">Create User</a>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover table-striped">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Role(s)</th>
+            <th>Email</th>
+            <th>Confirmed</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+          <tr>
+            <td>{{ user.name() }}</td>
+            <td>{{ user.roles|join(", ")|safe }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.email_confirmed_at }}</td>
+            <td>
+              <div class="btn-group" role="group" aria-label="...">
+                <a class="btn button-pill btn-sm btn-warning" href="{{ url_for('auth.delete_user_page', user_id=user.id) }}">
+                  Delete
+                </a>
+                <a class="btn button-pill btn-sm btn-warning" href="{{ url_for('auth.user_profile_page', user_id=user.id) }}">
+                  Edit
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 {% endblock %}

@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request, current_app
+from flask import render_template, redirect, url_for, flash, request, current_app, session
 from flask_user import current_user, login_required, roles_accepted
 from app import db
 from app.auth import auth_bp
@@ -77,6 +77,8 @@ def user_profile_page():
   form.roles.choices = [(r.id, r.name) for r in roles]
   current_roles = [r.id for r in user.roles]
 
+  session['login_next_url'] = url_for('auth.user_profile_page',user_id=user.id)
+
   if request.method == 'POST' and form.validate():
     user.first_name = request.form['first_name']
     user.last_name = request.form['last_name']
@@ -91,5 +93,7 @@ def user_profile_page():
   # for GET or Invalid POST
   return render_template('auth/user_profile.html',
                           current_user=current_user,
+                          form_user=user,
                           current_roles=current_roles,
                           form=form, admin=True)
+

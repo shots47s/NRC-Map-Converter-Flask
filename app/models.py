@@ -2,6 +2,7 @@ from flask_user import UserMixin
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from app import db
+from app.oauth import OAuth_pretty
 
 class User(db.Model, UserMixin):
   __tablename__ = 'users'
@@ -22,6 +23,7 @@ class User(db.Model, UserMixin):
   # Relationships
   roles = db.relationship('Role', secondary='users_roles',
                           backref=db.backref('users', lazy='dynamic'))
+
   def has_role(self, role):
     for item in self.roles:
       if item.name == 'admin':
@@ -34,6 +36,10 @@ class User(db.Model, UserMixin):
 
   def name(self):
     return self.first_name + " " + self.last_name
+
+  def oauths(self):
+    o = OAuth.query.filter(OAuth.user==self).all()
+    return [(x.provider,x.provider_user_login,OAuth_pretty[x.provider]) for x in o]
 
 
 # Define the Role data model
@@ -64,4 +70,5 @@ class OAuth(OAuthConsumerMixin, db.Model):
                                             collection_class=attribute_mapped_collection('provider'),
                                             cascade="all, delete-orphan")
                          )
+
 

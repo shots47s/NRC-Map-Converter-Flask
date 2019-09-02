@@ -53,8 +53,12 @@ def create_app(config_settings=Config):
 
   from app.models import User
   from app.auth.forms import CustomUserManager
-  print("here")
+
   user_manager = CustomUserManager(app, db, User)
+
+  @app.context_processor
+  def context_processor():
+    return dict(user_manager=user_manager)
 
   ### Initialize Email
   init_email_and_logs_error_handler(app)

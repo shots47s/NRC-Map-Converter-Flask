@@ -4,40 +4,98 @@
 
 {% block app_content %}
 
-  <!-- Breadcrumb-->
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item">Home</li>
-    <li class="breadcrumb-item">Admin</li>
-    <li class="breadcrumb-item active">User Profile</li>
-    <!-- Breadcrumb Menu-->
-    <li class="breadcrumb-menu d-md-down-none">
-      <div class="btn-group" role="group" aria-label="Button group">
-      </div>
-    </li>
-  </ol>
+<!-- Breadcrumb-->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">Home</li>
+      {% if current_user.has_role('admin') %}
+      <li class="breadcrumb-item">Admin</li>
+      {% endif %}
+      <li class="breadcrumb-item active">User Profile</li>
+    </ol>
+  </nav>
 
   <div class="row">
-    <div class="col-md-4">
-      <h1> Edit User Profile </h1>
-      <form action="" method="POST" class="form" role="form">
-        {{ form.hidden_tag() }}
-        {{ wtf.form_errors(form, hiddens="only") }}
-        <dl>
-          {{ wtf.form_field(form.first_name, class='form-control', placeholder='Edit the first name') }}
-          {{ wtf.form_field(form.last_name, class='form-control', placeholder='Edit the last name') }}
-          {% if admin %}
-            {{ render_multiselect_field(form.roles, current_roles) }}
-          {% endif %}
-        </dl>
-        <div class="card-footer ">
-          <button type="submit " class="btn btn-sm btn-primary ">
-            Submit
-          </button>
-          <button type="reset " class="btn btn-sm btn-danger ">
-            Cancel
-          </button>
-        </div>
-      </form>
+    <div class="col-md-4 py-3">
+      <h3>Edit User Profile</h3>
     </div>
   </div>
+  <form action="" method="POST" class="form col-md-4" role="form">
+    {{ form.hidden_tag() }}
+    {{ wtf.form_errors(form, hiddens="only") }}
+    {{ wtf.form_field(form.first_name, class='form-control', placeholder='Edit the first name') }}
+    {{ wtf.form_field(form.last_name, class='form-control', placeholder='Edit the last name') }}
+    {% if current_user.has_role('admin') %}
+      {{ render_multiselect_field(form.roles, current_roles) }}
+    {% endif %}
+    <button type="submit " class="btn btn-sm btn-primary ">
+      Submit
+    </button>
+    <button type="reset " class="btn btn-sm btn-danger ">
+      Cancel
+    </button>
+  </form>
+  <div class="row py-3 px-3">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          Account Associated with:
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover table-striped">
+              {% if form_user.oauths() %}
+                <thead>
+                  <th>
+                    Service
+                  </th>
+                  <th>
+                    Account
+                  </th>
+                </thead>
+                {% for s,u,p in form_user.oauths() %}
+                  <tr>
+                    <td>
+                      {{ p }}
+                    </td>
+                    <td>
+                      {{ u }}
+                    </td>
+                  </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                  <td>
+                    Account Not Associated with Any External Accounts
+                 </td>
+               </tr>
+              {% endif %}
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% if form_user.id == current_user.id %}
+  <div class ="row py-3 px-3">
+    <div class="col-md-4">
+      <a href="{{ url_for('google.login',redirect_to=url_for('auth.user_profile_page',user_id=form_user.id)) }}" class="btn btn-primary btn-labeled">
+        <span class="btn-label">
+          <i class="fab fa-google"></i>
+        </span>
+       Associate with Google
+      </a>
+    </div>
+  </div>
+  <div class="row px-3">
+    <div class="col-md-4">
+      <a href="{{ url_for('orcid.login') }}" class="btn btn-success btn-labeled">
+        <span class="btn-label">
+          <i class="ai ai-orcid"></i>
+        </span>
+        Associate with ORCID
+      </a>
+    </div>
+  </div>
+  {% endif %}
 {% endblock %}
