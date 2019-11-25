@@ -8,6 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_user import UserManager, UserMixin
 from flask_wtf.csrf import CSRFProtect
 from flask_bootstrap import Bootstrap
+from flask_uploads import configure_uploads
 from config import Config
 
 db = SQLAlchemy()
@@ -41,6 +42,12 @@ def create_app(config_settings=Config):
 
   from app.util import util_bp
   app.register_blueprint(util_bp)
+
+  from app.excel import excel_bp
+  app.register_blueprint(excel_bp)
+
+  from app.excel.routes import excels
+  configure_uploads(app, excels)
 
   from app.oauth.google_blueprint import google_blueprint
   app.register_blueprint(google_blueprint, url_prefix="/login")

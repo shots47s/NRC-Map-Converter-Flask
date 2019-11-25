@@ -48,6 +48,8 @@ class UserProfileForm(FlaskForm):
   def validate_roles(form,field):
     if field.data is None or len(field.data) == 0:
       raise ValidationError("Need to specify at least one role")
+
+
 class CustomUserManager(UserManager):
 
   def customize(self,app):

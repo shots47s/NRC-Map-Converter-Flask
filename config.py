@@ -32,7 +32,7 @@ class Config(object):
     USER_ENABLE_REGISTRATION      = True
     USER_REQUIRE_RETYPE_PASSWORD  = True
     USER_ENABLE_USERNAME          = False
-    USER_AFTER_LOGIN_ENDPOiNT     = "main.index"
+    USER_AFTER_LOGIN_ENDPOINT     = "main.index"
     USER_AFTER_LOGOUT_ENDPOINT    = "main.index"
     USER_ALLOW_LOGIN_WITHOUT_CONFIRMED_EMAIL = False
     USER_LOGIN_TEMPLATE           = "auth/flask_user/login.html"
@@ -46,4 +46,13 @@ class Config(object):
 
     ORCID_OAUTH_CLIENT_ID = os.environ.get("ORCID_OAUTH_CLIENT_ID")
     ORCID_OAUTH_CLIENT_SECRET = os.environ.get("ORCID_OAUTH_CLIENT_SECRET")
+
+    ## EXCEL FILE UPLOAD PARAMETERS
+    UPLOAD_DEFAULT_DEST = os.path.join(basedir,'/static/fileuploads')
+    UPLOAD_DEFAULT_URL = "/static/fileuploads"
+
+    UPLOADED_EXCELS_DEST = os.path.join(basedir,'app/static/excel-file-uploads')
+    UPLOADED_DEFAULT_URL = "/static/excel-file-uploads"
+    EXCEL_ALLOWED_EXTENSIONS = set(['xls','xslx','csv'])
+
 

@@ -71,4 +71,21 @@ class OAuth(OAuthConsumerMixin, db.Model):
                                             cascade="all, delete-orphan")
                          )
 
+# Excel files Model
+class ExcelFiles(db.Model):
+  __tablename__ = "excel_files"
+  id = db.Column(db.Integer(), primary_key=True)
+  name = db.Column(db.String(255), nullable=False, server_default='')
+  file_name = db.Column(db.String,default=None, nullable=False)
+  file_url = db.Column(db.String)
+  valid = db.Column(db.Boolean, server_default='0', nullable=False)
+  user_id = db.Column(db.Integer, db.ForeignKey(User.id),nullable=False)
+
+
+  def __repr__(self):
+    return '<Excel File id = {}, name = {}, filename = {}, user_id = {}>'\
+           .format(self.id, self.name, self.file_name,self.user_id)
+
+
+
 
