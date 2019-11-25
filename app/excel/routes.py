@@ -108,7 +108,7 @@ def deploy_excel_file():
     ## convert
     output_file_name = os.path.join(current_app.config['UPLOADED_EXCELS_DEST'],
                                     "{}_bivizio_conv.csv".format(eF.file_name.rsplit(".")[0]))
-    nrc2bivisio(eFP,output_file_name)
+    nrc2bivisio(eFP,output_file_name,current_app.config['GOOGLE_MAPS_API_KEY'])
     flash("File Deployed, Message Sent")
     return redirect(url_for('excel.display_excel_files'))
   except Exception as e:

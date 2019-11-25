@@ -8,8 +8,6 @@ from collections import OrderedDict
 import googlemaps
 import time
 
-API_KEY = "AIzaSyCDWPaS79_yDQJ8Ce0FtVEjxR_liz2QcKc"
-
 nrc2bivisio_map_dict = OrderedDict([
         ('ID','Id company'),
         ('Main Site','Id Branch'),
@@ -116,7 +114,7 @@ def findLocation(address, gmaps):
     #    print(g)
         return ('NA','NA')
 
-def nrc2bivisio(excel_file,output_file):
+def nrc2bivisio(excel_file,output_file,google_api_key):
     eF = p.get_dict(file_name=excel_file)
 
     output_rows = []
@@ -137,7 +135,7 @@ def nrc2bivisio(excel_file,output_file):
     ## aggregate Address information
     count = 0
     count2 = 0
-    gmaps = googlemaps.Client(key=API_KEY,queries_per_second=10,timeout=None)
+    gmaps = googlemaps.Client(key=google_api_key,queries_per_second=10,timeout=None)
     print(len(output_rows))
     for row in output_rows:
 

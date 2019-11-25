@@ -43,7 +43,6 @@ class Config(object):
     GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET")
     OAUTHLIB_INSECURE_TRANSPORT = os.environ.get("OAUTHLIB_INSECURE_TRANSPORT")
 
-
     ORCID_OAUTH_CLIENT_ID = os.environ.get("ORCID_OAUTH_CLIENT_ID")
     ORCID_OAUTH_CLIENT_SECRET = os.environ.get("ORCID_OAUTH_CLIENT_SECRET")
 
@@ -54,5 +53,9 @@ class Config(object):
     UPLOADED_EXCELS_DEST = os.path.join(basedir,'app/static/excel-file-uploads')
     UPLOADED_DEFAULT_URL = "/static/excel-file-uploads"
     EXCEL_ALLOWED_EXTENSIONS = set(['xls','xslx','csv'])
+
+    ## Google Maps API
+    GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
+
 
 
