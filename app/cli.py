@@ -12,12 +12,12 @@ def register(app):
     from app import db
     from app.models import User, Role, UsersRoles
 
-    user = User(first_name="admin",
-                last_name="admin",
-                email="admin@example.com",
+    user = User(first_name=os.getenv('ADMIN_INIT_FIRST_NAME'),
+                last_name=os.getenv('ADMIN_INIT_LAST_NAME'),
+                email=os.getenv('ADMIN_INIT_EMAIL'),
                 email_confirmed_at=datetime.utcnow(),
                 active=True,
-                password=app.user_manager.hash_password('Password1'))
+                password=app.user_manager.hash_password(os.getenv('ADMIN_INIT_PASSWORD')))
 
     user.roles.append(Role(name="admin"))
     user.roles.append(Role(name="member"))
