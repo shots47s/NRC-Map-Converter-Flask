@@ -1,1 +1,1 @@
-web: flask db upgrade; gunicorn nrcmap::app
+web: flask db upgrade; gunicorn nrcmap:app
