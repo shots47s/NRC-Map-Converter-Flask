@@ -16,7 +16,7 @@ class Config(object):
     MAIL_PASSWORD       = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = '"Shawn Brown" <shawntbrown@gmail.com>'
     ADMINS              = ['shawntbrown@gmail.com']
-    LOG_TO_STDOUT       = True
+    LOG_TO_STDOUT       = os.environ.get('LOG_TO_STDOUT')
 
 
     LANGUAGES = ['en', 'fr']
