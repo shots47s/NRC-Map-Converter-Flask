@@ -19,10 +19,8 @@
 <script>
 
 $(function() {
-    console.log("HED");
-    $('.mdb-select').multiselect(
-
-      );
+    $(".invalid-feedback").show();
+    $('.mdb-select').multiselect();
 });
 
 </script>
@@ -46,6 +44,9 @@ $(function() {
               <a class="nav-link" href="{{ url_for('auth.user_admin_page') }}">Admin</a>
             </li>
           {% endif %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('excel.display_excel_files') }}">Files</a>
+          </li>
         {% endif %}
        </ul>
        <ul class="navbar-nav">

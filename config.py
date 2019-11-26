@@ -32,7 +32,7 @@ class Config(object):
     USER_ENABLE_REGISTRATION      = True
     USER_REQUIRE_RETYPE_PASSWORD  = True
     USER_ENABLE_USERNAME          = False
-    USER_AFTER_LOGIN_ENDPOINT     = "main.index"
+    USER_AFTER_LOGIN_ENDPOINT     = "excel.display_excel_files"
     USER_AFTER_LOGOUT_ENDPOINT    = "main.index"
     USER_ALLOW_LOGIN_WITHOUT_CONFIRMED_EMAIL = False
     USER_LOGIN_TEMPLATE           = "auth/flask_user/login.html"
