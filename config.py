@@ -57,4 +57,9 @@ class Config(object):
     ## Google Maps API
     GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
 
+    ## Bivisio API
+    BIVISIO_API_KEY = os.environ.get("BIVISIO_API_KEY")
+    BIVISIO_API_URL = os.environ.get("BIVISIO_API_URL")
+
+
 

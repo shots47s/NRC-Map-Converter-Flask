@@ -9,7 +9,9 @@ from app.excel import excel_bp
 from app.excel.forms import UploadExcelFile
 from app.models import ExcelFiles
 from app import db
-from app.excel.nrc2bivisio import validate_headers_from_excel,nrc2bivisio
+from app.excel.nrc2bivisio import validate_headers_from_excel
+from app.excel.bivisio_api_client import Bivzio_API_Client
+
 excels = UploadSet('excels', tuple('xls xlsx csv'.split()))
 
 @excel_bp.route('/excel/upload',methods=['GET','POST'])
@@ -106,12 +108,17 @@ def deploy_excel_file():
       return redirect(request.referrer)
 
     ## convert
-    output_file_name = os.path.join(current_app.config['UPLOADED_EXCELS_DEST'],
-                                    "{}_bivizio_conv.csv".format(eF.file_name.rsplit(".")[0]))
-    nrc2bivisio(eFP,output_file_name,current_app.config['GOOGLE_MAPS_API_KEY'])
+    #output_file_name = os.path.join(current_app.config['UPLOADED_EXCELS_DEST'],
+    #                                "{}_bivizio_conv.csv".format(eF.file_name.rsplit(".")[0]))
+    #nrc2bivisio(eFP,output_file_name,current_app.config['GOOGLE_MAPS_API_KEY'])
+    b_api_client = Bivzio_API_Client(_token=current_app.config['BIVISIO_API_KEY'],
+                                     _url=current_app.config['BIVISIO_API_URL'])
+
+    b_api_client.update_bivisio_database_from_nrc_spreadsheet(eFP)
+
     flash("File Deployed, Message Sent")
     return redirect(url_for('excel.display_excel_files'))
   except Exception as e:
-    flash("There was an error trying to download the Excel File {}".format(e))
+    flash("There was an error trying to deploy the Excel File {}".format(e))
     return redirect(request.referrer)
 
