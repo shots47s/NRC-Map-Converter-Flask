@@ -99,7 +99,6 @@ def download_excel_file():
 @login_required
 def deploy_excel_file():
   from rq import Queue
-  from app.excel.worker import conn
   try:
     file_id = request.args.get('file_id')
     eF = ExcelFiles.query.filter(ExcelFiles.id==file_id).first()
