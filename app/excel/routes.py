@@ -88,7 +88,7 @@ def download_excel_file():
     if eF is None:
       flash("File {} not available for download".format(file_id))
       redirect(request.referrer)
-
+    print("EF = {}".format(eF))
     return send_from_directory(current_app.config['UPLOADED_EXCELS_DEST'],
                                eF.file_name, as_attachment=True)
   except Exception as e:
