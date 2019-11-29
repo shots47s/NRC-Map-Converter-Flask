@@ -1,9 +1,10 @@
 import os
+from flask_dotenv import DotEnv
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
-    SECRET_KEY = os.environ.get('SECRET_KEY')
+    SECRET_KEY = os.environ.get('SECRET_KEY') or "asdfgaetghaerioghaoanvaewvonaiegiaonvaeve"
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL") or \
       'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -61,5 +62,10 @@ class Config(object):
     BIVISIO_API_KEY = os.environ.get("BIVISIO_API_KEY")
     BIVISIO_API_URL = os.environ.get("BIVISIO_API_URL")
 
+    ### REDIS
+    REDIS_URL = os.environ.get('REDIS_URL') or 'redis:///'
 
-
+    # @classmethod
+    # def init_app(self, app):
+    #     env = DotEnv()
+    #     env.init_app(app)

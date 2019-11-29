@@ -1,8 +1,13 @@
+from flask import current_app
 from flask_user import UserMixin
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from sqlalchemy.orm.collections import attribute_mapped_collection
 from app import db
 from app.oauth import OAuth_pretty
+import redis
+import rq
+from time import time
+import json
 
 class User(db.Model, UserMixin):
   __tablename__ = 'users'
@@ -23,6 +28,10 @@ class User(db.Model, UserMixin):
   # Relationships
   roles = db.relationship('Role', secondary='users_roles',
                           backref=db.backref('users', lazy='dynamic'))
+  notifications = db.relationship('Notification', backref='users',
+                                  lazy='dynamic')
+
+  tasks = db.relationship('Task', backref='users', lazy='dynamic')
 
   def has_role(self, role):
     for item in self.roles:
@@ -41,6 +50,31 @@ class User(db.Model, UserMixin):
     o = OAuth.query.filter(OAuth.user==self).all()
     return [(x.provider,x.provider_user_login,OAuth_pretty[x.provider]) for x in o]
 
+  def add_notification(self, name, data):
+    import json
+    self.notifications.filter_by(name=name).delete()
+    print("adding HERE")
+    n = Notification(name=name, payload_json=json.dumps(data), users=self)
+    print("Made it")
+    db.session.add(n)
+    print("Added")
+    return n
+
+  def launch_task(self, name, description, *args, **kwargs):
+    rq_job = current_app.task_queue.enqueue('app.tasks.' + name, self.id,
+                                            *args, **kwargs)
+
+    task = Task(id=rq_job.get_id(), name=name, description=description,
+                users=self)
+
+    db.session.add(task)
+    return task
+
+  def get_tasks_in_progress(self):
+    return Task.query.filter_by(users=self, complete=False).all()
+
+  def get_task_in_progress(self, name):
+    return Task.query.filter_by(name=name, users=self, complete=False).first()
 
 # Define the Role data model
 class Role(db.Model):
@@ -86,6 +120,37 @@ class ExcelFiles(db.Model):
     return '<Excel File id = {}, name = {}, filename = {}, user_id = {}>'\
            .format(self.id, self.name, self.file_name,self.user_id)
 
+#Notification Model
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    timestamp = db.Column(db.Float, index=True, default=time)
+    payload_json = db.Column(db.Text)
+
+    def get_data(self):
+        return json.loads(str(self.payload_json))
 
 
+# Task Model
+class Task(db.Model):
+    id = db.Column(db.String(36), primary_key=True)
+    name = db.Column(db.String(128), index=True)
+    description = db.Column(db.String(128))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    complete = db.Column(db.Boolean, default=False)
 
+    def get_rq_job(self):
+        try:
+            rq_job = rq.job.Job.fetch(self.id, connection=current_app.redis)
+        except (redis.exceptions.RedisError, rq.exceptions.NoSuchJobError):
+            return None
+        return rq_job
+
+    def get_progress(self):
+        job = self.get_rq_job()
+        return job.meta.get('progress', 0) if job is not None else 100
+
+    def signal_completed(self):
+      self.complete = True
+      db.session.commit()

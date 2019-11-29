@@ -1,6 +1,6 @@
 
 from app import create_app, db, cli
-from app.models import User, Role, UsersRoles
+from app.models import User, Role, UsersRoles, Notification
 #from app.auth.forms import CustomUserManager
 
 
@@ -9,4 +9,5 @@ cli.register(app)
 
 @app.shell_context_processor
 def make_shell_context():
-  return {'db':db, 'User': User, 'Role': Role, 'UserRoles': UsersRoles}
+  return {'db':db, 'User': User, 'Role': Role, 'UserRoles': UsersRoles,
+          'Notification': Notification}

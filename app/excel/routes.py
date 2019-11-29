@@ -2,7 +2,7 @@
 import os
 from flask import render_template, redirect, url_for, flash, request, current_app, session
 from flask import send_from_directory
-from flask_user import current_user
+from flask_user import current_user,login_required
 from flask_uploads import UploadSet,UploadNotAllowed
 import pyexcel as p
 from app.excel import excel_bp
@@ -15,6 +15,7 @@ from app.excel.bivisio_api_client import Bivzio_API_Client
 excels = UploadSet('excels', tuple('xls xlsx csv'.split()))
 
 @excel_bp.route('/excel/upload',methods=['GET','POST'])
+@login_required
 def upload_excel_file():
   form = UploadExcelFile(form = request.form, obj=None)
   if request.method == 'POST':
@@ -56,11 +57,13 @@ def upload_excel_file():
   return render_template('/excel/file_upload.html',form=form, admin=True)
 
 @excel_bp.route("/excel/files",methods=["GET"])
+@login_required
 def display_excel_files():
   excel_files = ExcelFiles.query.all()
   return render_template('/excel/display_files.html', excel_files=excel_files)
 
 @excel_bp.route("/excel/delete", methods=['GET'])
+@login_required
 def delete_excel_file():
   try:
     file_id = request.args.get('file_id')
@@ -77,6 +80,7 @@ def delete_excel_file():
     return redirect(request.referrer)
 
 @excel_bp.route('/excel/download',methods=["GET"])
+@login_required
 def download_excel_file():
   try:
     file_id = request.args.get('file_id')
@@ -92,7 +96,10 @@ def download_excel_file():
     return redirect(request.referrer)
 
 @excel_bp.route('/excel/deploy',methods=["GET"])
+@login_required
 def deploy_excel_file():
+  from rq import Queue
+  from app.excel.worker import conn
   try:
     file_id = request.args.get('file_id')
     eF = ExcelFiles.query.filter(ExcelFiles.id==file_id).first()
@@ -107,16 +114,27 @@ def deploy_excel_file():
         flash(msg)
       return redirect(request.referrer)
 
+    if current_user.get_task_in_progress('deploy_nrc'):
+      flash('A deployment task is already in progress')
+    else:
+      current_user.launch_task('update_bivisio_database_task', 'Deploying Data...',
+                                eFP)
+      db.session.commit()
     ## convert
     #output_file_name = os.path.join(current_app.config['UPLOADED_EXCELS_DEST'],
     #                                "{}_bivizio_conv.csv".format(eF.file_name.rsplit(".")[0]))
     #nrc2bivisio(eFP,output_file_name,current_app.config['GOOGLE_MAPS_API_KEY'])
-    b_api_client = Bivzio_API_Client(_token=current_app.config['BIVISIO_API_KEY'],
-                                     _url=current_app.config['BIVISIO_API_URL'])
 
-    b_api_client.update_bivisio_database_from_nrc_spreadsheet(eFP)
 
-    flash("File Deployed, Message Sent")
+    # b_api_client = Bivzio_API_Client(_token=current_app.config['BIVISIO_API_KEY'],
+    #                                  _url=current_app.config['BIVISIO_API_URL'])
+
+    # q = Queue(connection=conn)
+
+    # result = q.enqueue(b_api_client.update_bivisio_database_from_nrc_spreadsheet, eFP)
+    #b_api_client.update_bivisio_database_from_nrc_spreadsheet(eFP)
+
+    #flash("Deployment underway")
     return redirect(url_for('excel.display_excel_files'))
   except Exception as e:
     flash("There was an error trying to deploy the Excel File {}".format(e))

@@ -332,7 +332,7 @@ class Bivzio_API_Client:
     def update_bivisio_database_from_nrc_spreadsheet(self, nrc_file_name):
 
         json_array = self.convert_nrc_workbook_to_biv_json_list(nrc_file_name)
-
-        for biv_json in json_array:
-            self.update_bivisio_entry(biv_json)
+        print(json_array[0])
+        #for biv_json in json_array:
+        #    self.update_bivisio_entry(biv_json)
 

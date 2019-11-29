@@ -24,6 +24,39 @@ $(function() {
 });
 
 </script>
+
+ <script>
+    function set_task_progress(task_id, progress) {
+        $('#' + task_id + '-progress').text(progress);
+    }
+ </script>
+
+ <script>
+    {% if current_user.is_authenticated %}
+    $(function() {
+        var since = 0;
+        setInterval(function() {
+            $.ajax('{{ url_for('main.notifications') }}?since=' + since).done(
+                function(notifications) {
+                    for (var i = 0; i < notifications.length; i++) {
+                        switch (notifications[i].name) {
+                          case 'unread_message_count':
+                              set_message_count(notifications[i].data);
+                              break;
+                          case 'task_progress':
+                              set_task_progress(
+                                  notifications[i].data.task_id,
+                                  notifications[i].data.progress);
+                              break;
+                        }
+                        since = notifications[i].timestamp;
+                    }
+                }
+            );
+        }, 10000);
+    });
+  </script>
+    {% endif %}
 {% endblock %}
 
 
@@ -77,11 +110,32 @@ $(function() {
     <div class="container ml-0">
         {% with messages = get_flashed_messages() %}
         {% if messages %}
-            {% for message in messages %}
+            {% for message in messages[-1] %}
             <div class="alert alert-info" role="alert">{{ message }}</div>
             {% endfor %}
         {% endif %}
         {% endwith %}
+
+        {% if current_user.is_authenticated %}
+        {% with tasks = current_user.get_tasks_in_progress() %}
+        {% if tasks %}
+            {% for task in tasks %}
+              <div class="alert alert-success" role="alert">
+                {{ task.description }}
+                {% if not task.complete %}
+                  {% if task.get_progress() == 100 %}
+                      Completed
+                      {{ '' if not task.signal_completed() }}
+                  {% else %}
+                    <span id="{{ task.id }}-progress">{{ task.get_progress() }}</span>%
+                  {% endif %}
+                {% endif %}
+
+              </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+        {% endif %}
 
         {# application content needs to be provided in the app_content block #}
         {% block app_content %}{% endblock %}

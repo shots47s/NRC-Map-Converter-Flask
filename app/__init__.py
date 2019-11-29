@@ -8,14 +8,18 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_user import UserManager, UserMixin
 from flask_wtf.csrf import CSRFProtect
 from flask_bootstrap import Bootstrap
+from flask_dotenv import DotEnv
 from flask_uploads import configure_uploads
 from config import Config
+from redis import Redis
+import rq
 
 db = SQLAlchemy()
 csrf_protect = CSRFProtect()
 mail = Mail()
 migrate = Migrate()
 bootstrap = Bootstrap()
+env = DotEnv()
 
 def create_app(config_settings=Config):
 
@@ -27,6 +31,7 @@ def create_app(config_settings=Config):
   mail.init_app(app)
   csrf_protect.init_app(app)
   bootstrap.init_app(app)
+  env.init_app(app, env_file=os.path.join(os.getcwd(),'.flaskenv'))
 
   from app.util import filters
 
@@ -36,6 +41,9 @@ def create_app(config_settings=Config):
     return isinstance(field,HiddenField)
 
   app.jinja_env.globals['bootstrap_is_hidden_field'] = is_hidden_field_filter
+
+  app.redis = Redis.from_url(app.config['REDIS_URL'])
+  app.task_queue = rq.Queue('nrc-tasks', connection=app.redis)
 
   from app.auth import auth_bp
   app.register_blueprint(auth_bp)
