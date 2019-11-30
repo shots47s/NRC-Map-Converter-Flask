@@ -31,6 +31,7 @@ $(function() {
     }
  </script>
 
+
  <script>
     {% if current_user.is_authenticated %}
     $(function() {
@@ -44,16 +45,30 @@ $(function() {
                               set_message_count(notifications[i].data);
                               break;
                           case 'task_progress':
-                              set_task_progress(
+                              console.log("setting task progress " + notifications[i].data.progress);
+                              if(notifications[i].data.progress == "Error"){
+                                set_task_progress(
                                   notifications[i].data.task_id,
-                                  notifications[i].data.progress);
+                                  "There was an Error, please retry deployment or contact developers.");
+                              }
+                              else if(notifications[i].data.progress == 100){
+                                set_task_progress(
+                                    notifications[i].data.task_id,
+                                    "Completed");
+                              }
+                              else{
+                                console.log("HERE");
+                                set_task_progress(
+                                    notifications[i].data.task_id,
+                                    notifications[i].data.progress + "%");
+                              }
                               break;
                         }
                         since = notifications[i].timestamp;
                     }
                 }
             );
-        }, 10000);
+        }, 1000);
     });
   </script>
     {% endif %}
@@ -110,7 +125,7 @@ $(function() {
     <div class="container ml-0">
         {% with messages = get_flashed_messages() %}
         {% if messages %}
-            {% for message in messages[-1] %}
+            {% for message in messages %}
             <div class="alert alert-info" role="alert">{{ message }}</div>
             {% endfor %}
         {% endif %}
@@ -122,15 +137,17 @@ $(function() {
             {% for task in tasks %}
               <div class="alert alert-success" role="alert">
                 {{ task.description }}
+                <span id="{{ task.id }}-progress"></span>
                 {% if not task.complete %}
-                  {% if task.get_progress() == 100 %}
-                      Completed
+                  {% if task.get_progress() %}
+                    {% if task.get_progress() == "Error" %}
                       {{ '' if not task.signal_completed() }}
-                  {% else %}
-                    <span id="{{ task.id }}-progress">{{ task.get_progress() }}</span>%
+                    {% elif task.get_progress() == 100 %}
+                        {{ '' if not task.signal_completed() }}
+                    {% else %}
+                    {% endif %}
                   {% endif %}
                 {% endif %}
-
               </div>
             {% endfor %}
         {% endif %}

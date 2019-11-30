@@ -114,7 +114,13 @@ class ExcelFiles(db.Model):
   file_url = db.Column(db.String)
   valid = db.Column(db.Boolean, server_default='0', nullable=False)
   user_id = db.Column(db.Integer, db.ForeignKey(User.id),nullable=False)
+  contents = db.Column(db.Text)
+  deployed = db.Column(db.Boolean, default=False)
 
+  def set_deployed(self):
+    self.deployed = True
+    print("------------setting deployed")
+    db.session.commit()
 
   def __repr__(self):
     return '<Excel File id = {}, name = {}, filename = {}, user_id = {}>'\

@@ -7,6 +7,7 @@ from collections import OrderedDict
 import pprint
 import datetime
 import openpyxl
+from io import BytesIO
 
 nrc2bivisio_main_map_dict = OrderedDict([
     ('id', 'Id company'),
@@ -182,7 +183,7 @@ class Bivzio_API_Client:
         row_branch_map = {}
 
         # Get Headers for index lookup
-        wb = openpyxl.load_workbook(_nrc_file)
+        wb = openpyxl.load_workbook(filename=BytesIO(_nrc_file))
         ws = wb.active
 
         # get headers for indexing
@@ -325,7 +326,7 @@ class Bivzio_API_Client:
         print("looking_for_biv_id: {}".format(biv_json_['external_id']))
         db_entry = self.get_from_id(biv_json_['external_id'],use_biv_id=False)
         if db_entry:
-           self.edit_exist_entry(biv_json_['external_id'],biv_json_)
+            self.edit_exist_entry(biv_json_['external_id'],biv_json_)
         else:
             self.create_new_entry(biv_json_)
 

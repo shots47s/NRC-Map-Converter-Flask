@@ -28,18 +28,27 @@
               {% else %}
                 No
               {% endif %}
+              ,
+              {% if xf.deployed %}
+                Deployed
+              {% else %}
+                Not Deployed
+              {% endif %}
             </td>
             <td>
+              <!--
               <div class="btn-group" role="group" aria-label="...">
                 <a class="btn button-pill btn-sm btn-warning" href="{{ url_for('excel.download_excel_file', file_id=xf.id) }}">
                   Download
                 </a>
               </div>
+            -->
               <div class="btn-group" role="group" aria-label="...">
                 <a class="btn button-pill btn-sm btn-warning" href="{{ url_for('excel.delete_excel_file', file_id=xf.id) }}">
                   Delete
                 </a>
               </div>
+
               <div class="btn-group" role="group" aria-label="...">
                 <a class="btn button-pill btn-sm btn-warning
                   {% if not xf.valid %}

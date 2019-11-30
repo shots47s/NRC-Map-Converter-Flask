@@ -65,7 +65,6 @@ class Config(object):
     ### REDIS
     REDIS_URL = os.environ.get('REDIS_URL') or 'redis:///'
 
-    # @classmethod
-    # def init_app(self, app):
+     # def init_app(self, app):
     #     env = DotEnv()
     #     env.init_app(app)
