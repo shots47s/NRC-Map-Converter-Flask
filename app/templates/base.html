@@ -21,16 +21,19 @@
 $(function() {
     $(".invalid-feedback").show();
     $('.mdb-select').multiselect();
+    $("[id$='dismiss'").click( function(){
+      id_par = $(this).attr('id').replace("_dismiss","");
+
+    });
 });
 
 </script>
 
  <script>
-    function set_task_progress(task_id, progress) {
-        $('#' + task_id + '-progress').text(progress);
-    }
+    function set_task_progress(task_id, batch_id, progress) {
+        $('#' + batch_id + '-progress').text(progress);
+      }
  </script>
-
 
  <script>
     {% if current_user.is_authenticated %}
@@ -49,17 +52,20 @@ $(function() {
                               if(notifications[i].data.progress == "Error"){
                                 set_task_progress(
                                   notifications[i].data.task_id,
+                                  notifications[i].data.batch_id,
                                   "There was an Error, please retry deployment or contact developers.");
                               }
                               else if(notifications[i].data.progress == 100){
                                 set_task_progress(
                                     notifications[i].data.task_id,
+                                    notifications[i].data.batch_id,
                                     "Completed");
                               }
                               else{
                                 console.log("HERE");
                                 set_task_progress(
                                     notifications[i].data.task_id,
+                                    notifications[i].data.batch_id,
                                     notifications[i].data.progress + "%");
                               }
                               break;
@@ -134,21 +140,18 @@ $(function() {
         {% if current_user.is_authenticated %}
         {% with tasks = current_user.get_tasks_in_progress() %}
         {% if tasks %}
+            {% set this_batch_ns = namespace(batch_id=-1) %}
             {% for task in tasks %}
-              <div class="alert alert-success" role="alert">
-                {{ task.description }}
-                <span id="{{ task.id }}-progress"></span>
-                {% if not task.complete %}
-                  {% if task.get_progress() %}
-                    {% if task.get_progress() == "Error" %}
-                      {{ '' if not task.signal_completed() }}
-                    {% elif task.get_progress() == 100 %}
-                        {{ '' if not task.signal_completed() }}
-                    {% else %}
-                    {% endif %}
-                  {% endif %}
+              {% if task.batch_id != this_batch_ns.batch_id %}
+                {% set this_batch_ns.batch_id = task.batch_id %}
+                {% if not task.is_job_done() %}
+                  <div class="alert alert-success" role="alert">
+                    {{ task.description }} : {{ this_batch_id }}
+                    <span id="{{ task.batch_id }}-progress"></span>
+                    <button id="{{ task.batch_id }}_dismiss" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  </div>
                 {% endif %}
-              </div>
+              {% endif %}
             {% endfor %}
         {% endif %}
         {% endwith %}

@@ -60,12 +60,13 @@ class User(db.Model, UserMixin):
     print("Added")
     return n
 
-  def launch_task(self, name, description, *args, **kwargs):
-    rq_job = current_app.task_queue.enqueue('app.tasks.' + name, self.id,
+  def launch_task(self, name, description, batch_id, *args, **kwargs):
+    print("args = {}".format(*args))
+    rq_job = current_app.task_queue.enqueue('app.tasks.' + name, self.id, batch_id,
                                             *args, **kwargs)
-
+    print("LT: {} {} {} {} {}".format(name,self.id, batch_id, *args, **kwargs))
     task = Task(id=rq_job.get_id(), name=name, description=description,
-                users=self)
+                users=self, batch_id=batch_id)
 
     db.session.add(task)
     return task
@@ -145,6 +146,7 @@ class Task(db.Model):
     description = db.Column(db.String(128))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     complete = db.Column(db.Boolean, default=False)
+    batch_id = db.Column(db.String(10))
 
     def get_rq_job(self):
         try:
@@ -157,6 +159,11 @@ class Task(db.Model):
         job = self.get_rq_job()
         return job.meta.get('progress', 0) if job is not None else 100
 
+    def is_job_done(self):
+      job = self.get_rq_job()
+      return job.is_finished if job is not None else True
+
     def signal_completed(self):
+      print("singalling complete!!!! {}".format(self.id))
       self.complete = True
       db.session.commit()

@@ -108,6 +108,8 @@ def download_excel_file():
 @login_required
 def deploy_excel_file():
   from rq import Queue
+  import json
+  from random import randint
   try:
     file_id = request.args.get('file_id')
     eF = ExcelFiles.query.filter(ExcelFiles.id==file_id).first()
@@ -126,8 +128,13 @@ def deploy_excel_file():
     if current_user.get_task_in_progress('deploy_nrc'):
       flash('A deployment task is already in progress')
     else:
-      current_user.launch_task('update_bivisio_database_task', 'Deploying Data...',
-                                eF)
+      num_entries = len(json.loads(eF.contents))
+      batch_id = randint(0,9999999999)
+      chunk_size = 300
+      for ir in range (0,num_entries,chunk_size):
+        print("IRS = {} {} {} {}".format(ir, ir+chunk_size,num_entries,batch_id))
+        current_user.launch_task('update_bivisio_database_task', 'Deploying Data...',
+                                  batch_id, eF, ir, ir+chunk_size)
       db.session.commit()
     ## convert
     #output_file_name = os.path.join(current_app.config['UPLOADED_EXCELS_DEST'],
